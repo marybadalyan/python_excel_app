@@ -1,2 +1,14 @@
 # python_exel_app
-This is a python app that processes data from an excel sheet and also gives you the ability to add more data 
+
+This Python app uses Tkinter for GUI processes data from an Excel sheet and allows users to insert additional data, updating the sheet dynamically.
+
+The Excel sheet contains car ownership data, including fields such as:
+
+Owner name
+Car plate
+Car color
+Car make
+Year
+Auto service status
+
+The app also uses Forest-ttk-theme by rdbende (https://github.com/rdbende/Forest-ttk-theme), and builds upon the foundation of codefirstio's "tkinter-excel-app" (https://github.com/codefirstio/tkinter-excel-app).
