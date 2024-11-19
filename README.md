@@ -11,4 +11,7 @@ Car make
 Year
 Auto service status
 
-The app also uses Forest-ttk-theme by rdbende (https://github.com/rdbende/Forest-ttk-theme), and builds upon the foundation of codefirstio's "tkinter-excel-app" (https://github.com/codefirstio/tkinter-excel-app).
+BE SURE TO INSTALL
+
+The app also uses Forest-ttk-theme by rdbende (https://github.com/rdbende/Forest-ttk-theme)
+Builds upon the foundation of codefirstio's "tkinter-excel-app" (https://github.com/codefirstio/tkinter-excel-app).
