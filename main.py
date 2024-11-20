@@ -1,70 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
-import openpyxl
-
-class ProcessData():
-    def __init__(self,path,treeView):
-        self.path = path
-        self.treeView = treeView
-
-    def load_data(self):
-        workbook = openpyxl.load_workbook(self.path)
-        sheet = workbook.active
-
-        list_values = list(sheet.values)
-
-        for col_name in list_values[0]:
-            self.treeView.heading(col_name, text=col_name)
-
-        for value_tuple in list_values[1:]:
-            self.treeView.insert('',tk.END,values=value_tuple)
-    
-    def insert_row(self,name,plate,color,make,year,serviced):
-        workbook = openpyxl.load_workbook(self.path)
-        sheet = workbook.active
-        new_values = (name,plate,color,make,year,serviced)
-       
-        sheet.append(new_values)
-        workbook.save(self.path)
-
-        self.treeView.insert('',tk.END,values=new_values)
-
-    def filter_data(self, name, plate, color, make, year, serviced):
-        for item in self.treeView.get_children():
-            self.treeView.delete(item)
-            
-        workbook = openpyxl.load_workbook(self.path)
-        sheet = workbook.active
-        list_values = list(sheet.values)
-
-        for value_tuple in list_values[1:]:
-            row_name = value_tuple[0].strip() if value_tuple[0] else ""
-            row_plate = value_tuple[1].strip() if value_tuple[1] else ""
-            row_color = value_tuple[2].strip() if value_tuple[2] else ""
-            row_make = value_tuple[3].strip() if value_tuple[3] else ""
-            row_year = str(value_tuple[4]).strip() if value_tuple[4] else ""
-            row_serviced = value_tuple[5].strip() if value_tuple[5] else ""
-
-           
-            matches = True
-            if name and name != "Name" and name != row_name:
-                matches = False
-            if plate and plate != "Plate" and plate != row_plate:
-                matches = False
-            if color and color != "Color" and color != row_color:
-                matches = False
-            if make and make != "Make" and make != row_make:
-                matches = False
-            if year and year !="Year" and str(year) != row_year:
-                matches = False
-            if serviced and serviced != row_serviced:
-                matches = False
-
-            if matches:
-                self.treeView.insert('', tk.END, values=value_tuple)
-
-
+import ProcessData as pd
 
 root = tk.Tk()
 
@@ -94,11 +30,13 @@ label_frame.grid(row=0,column=0,padx=5,pady=10)
 name_entry_widget=ttk.Entry(label_frame)
 name_entry_widget.insert("0","Name")
 name_entry_widget.bind("<FocusIn>",lambda n:name_entry_widget.delete("0","end"))
+name_entry_widget.bind("<FocusOut>",lambda e:name_entry_widget.insert("0","Name")if name_entry_widget.get() == '' else None)
 name_entry_widget.grid(row=0,column=0,padx=5,pady=(0,5),sticky="ew")
 
-plate_entry_widget=ttk.Entry(label_frame)
+plate_entry_widget=ttk.Entry(label_frame,text = "Plate")
 plate_entry_widget.insert("0","Plate")
 plate_entry_widget.bind("<FocusIn>",lambda p:plate_entry_widget.delete("0","end"))
+plate_entry_widget.bind("<FocusOut>",lambda  e:plate_entry_widget.insert("0","Plate") if plate_entry_widget.get() == '' else None)
 plate_entry_widget.grid(row=1,column=0,padx=5,pady=(0,5),sticky="ew")
 
 year_spin_widget = ttk.Spinbox(label_frame,from_=1970,to=2025)
@@ -150,7 +88,7 @@ treeView.pack()
 scroll_bar.config(command=treeView.yview)
 
 path = r"C:\Users\maryb\OneDrive\Desktop\python exel app\car_owners.xlsx"
-car_owners = ProcessData(path,treeView)
+car_owners = pd.ProcessData(path,treeView)
 
 car_owners.load_data()
 
@@ -178,16 +116,41 @@ def search_data():
     car_owners.filter_data(name, plate, color, make, year, serviced)
 
 def insert_data():
-    try:
+       
+    if name_entry_widget.get() != "Name" and name_entry_widget.get().strip() != '':
         name = name_entry_widget.get()
+    else:
+        name_entry_widget.delete(0, tk.END)  # Clear the Entry widget
+        name_entry_widget.insert(0, "*Required Field") 
+       
+    if plate_entry_widget.get() != "Plate" and plate_entry_widget.get().strip() != '':
         plate = plate_entry_widget.get()
+    else:
+        plate_entry_widget.delete(0,tk.END)
+        plate_entry_widget.insert(0,"*Required Field")
+
+    if  combo_widget_colors.get() != "Color" and combo_widget_colors.get().strip() != '':
         color = combo_widget_colors.get()
+    else:
+        combo_widget_colors.delete(0,tk.END)
+        combo_widget_colors.insert(0,"*Required Field")
+
+    if  combo_widget_make.get() != "Make" and combo_widget_make.get().strip() != "":
         make = combo_widget_make.get()
+        if make not in makes:
+            makes = makes.insert(0,make)
+    else:
+        combo_widget_make.delete(0,tk.END)
+        combo_widget_make.insert(0,"*Required Field")
+
+    if  year_spin_widget.get() != "Year" and year_spin_widget.get().strip() != '':
         year = int(year_spin_widget.get())
-        serviced = "Serviced" if service_butt.get() else "Not serviced"
-    except Exception as e:
-        reset_widgets()
-    
+    else:
+        year_spin_widget.delete(0,tk.END)
+        year_spin_widget.insert(0,"*Required Field")
+
+    serviced = "Serviced" if service_butt.get() else "Not serviced"        
+
     car_owners.insert_row(name,plate,color,make,year,serviced)
     
     reset_widgets()
