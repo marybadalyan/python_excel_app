@@ -10,6 +10,7 @@ class ProcessData():
         self.treeView = treeView
 
     def load_data(self):
+
         for item in self.treeView.get_children():
             self.treeView.delete(item)
         
@@ -31,8 +32,19 @@ class ProcessData():
        
         sheet.append(new_values)
         workbook.save(self.path)
-        print(sheet.max_row)
         self.treeView.insert('',tk.END,values=new_values)
+
+  
+    def plate_exists(self,plate):
+        workbook = openpyxl.load_workbook(self.path)
+        sheet = workbook.active
+        list_values = list(sheet.values)
+
+        for item in list_values:
+            if item[1].strip() == plate and plate != "Plate":
+                return True
+        
+        return False
 
     def filter_data(self, name, plate, color, make, year, serviced):
         workbook = openpyxl.load_workbook(self.path)
@@ -68,7 +80,6 @@ class ProcessData():
             if not matches:
                 self.treeView.delete(item)
 
-            
         
 
         

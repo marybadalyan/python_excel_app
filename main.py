@@ -4,6 +4,8 @@ import ProcessData as pd
 
 root = tk.Tk()
 
+root.resizable(False, False)
+
 style = ttk.Style(root)
 
 root.tk.call("source", "forest-light.tcl")
@@ -57,10 +59,10 @@ check_button.grid(row=5,column=0,padx=5,pady=(0,5),sticky="ew")
 
 
 separator = ttk.Separator(label_frame)
-separator.grid(row=7,column=0,padx=5,pady=(10,5),sticky="ew")
+separator.grid(row=6,column=0,padx=5,pady=(5,10),sticky="ew")
 
 mode_butt = ttk.Checkbutton(label_frame,text="Lite/Dark Mode",style="Switch",command=mode_switch)
-mode_butt.grid(row=9,column=0,padx=5,pady=(0,10),sticky="nsew")
+mode_butt.grid(row=10,column=0,padx=5,pady=(0,10),sticky="nsew")
 
 
 treeFrame = ttk.Frame(frame)
@@ -74,7 +76,7 @@ scroll_bar.pack(side="right",fill="y")
 
 
 
-treeView = ttk.Treeview(treeFrame,show="headings",yscrollcommand=scroll_bar.set, columns=cols,height=15) 
+treeView = ttk.Treeview(treeFrame,show="headings",yscrollcommand=scroll_bar.set, columns=cols,height=18) 
 treeView.column("Name",width=100)
 treeView.column("Plate",width=70)
 treeView.column("Color",width=60)
@@ -87,7 +89,7 @@ treeView.pack()
 
 scroll_bar.config(command=treeView.yview)
 
-path = r"C:\Users\maryb\OneDrive\Desktop\python exel app\car_owners.xlsx"
+path = r"C:\Users\maryb\OneDrive\Desktop\python projects\python exel app\car_owners.xlsx"
 car_owners = pd.ProcessData(path,treeView)
 
 car_owners.load_data()
@@ -116,7 +118,6 @@ def search_data():
     car_owners.filter_data(name, plate, color, make, year, serviced)
 
 def insert_data():
-       
     if name_entry_widget.get() != "Name" and name_entry_widget.get().strip() != '':
         name = name_entry_widget.get()
     else:
@@ -137,8 +138,6 @@ def insert_data():
 
     if  combo_widget_make.get() != "Make" and combo_widget_make.get().strip() != "":
         make = combo_widget_make.get()
-        if make not in makes:
-            makes = makes.insert(0,make)
     else:
         combo_widget_make.delete(0,tk.END)
         combo_widget_make.insert(0,"*Required Field")
@@ -151,20 +150,28 @@ def insert_data():
 
     serviced = "Serviced" if service_butt.get() else "Not serviced"        
 
-    car_owners.insert_row(name,plate,color,make,year,serviced)
-    
+    if car_owners.plate_exists(plate):
+        reset_widgets()
+        plate_entry_widget.delete(0,tk.END)
+        plate_entry_widget.insert(0,"*Plate exists")
+    else:
+        car_owners.insert_row(name,plate,color,make,year,serviced)
+        reset_widgets()
+
+def filter_erase():
     reset_widgets()
+    car_owners.load_data()
 
 
-reset_buttn = ttk.Button(label_frame,text="Reset",command=car_owners.load_data)
-reset_buttn.grid(row=8,column=0,padx=5,pady=(5,5),sticky="ew")
+reset_buttn = ttk.Button(label_frame,text="Reset",command=filter_erase)
+reset_buttn.grid(row=9,column=0,padx=5,pady=(5,5),sticky="ew")
 
 filter_buttn = ttk.Button(label_frame,text="Filter",command=search_data)
-filter_buttn.grid(row=6,column=0,padx=5,pady=(0,5),sticky="ew")
+filter_buttn.grid(row=7,column=0,padx=5,pady=(0,5),sticky="ew")
 
 
 insert_buttn = ttk.Button(label_frame,text="Insert",command=insert_data)
-insert_buttn.grid(row=7,column=0,padx=5,pady=(5,5),sticky="ew")
+insert_buttn.grid(row=8,column=0,padx=5,pady=(5,5),sticky="ew")
 
 
 
